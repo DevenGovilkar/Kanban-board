@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kanban Board</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="header__left">
+        <div class="header__logo">
+          <i class="fa-solid fa-grip-vertical"></i>
+          <span>KanFlow</span>
+        </div>
+        <nav class="header__nav">
+          <a href="#" class="nav-link active">Board</a>
+          <a href="#" class="nav-link">Timeline</a>
+          <a href="#" class="nav-link">Reports</a>
+        </nav>
+      </div>
+      <div class="header__right">
+        <button class="btn btn--icon" title="Search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+        <button class="btn btn--icon" title="Notifications">
+          <i class="fa-solid fa-bell"></i>
+        </button>
+        <div class="avatar" title="Profile">D</div>
+      </div>
+    </header>
+
+    <!-- Board Title Bar -->
+    <div class="board-bar">
+      <div class="board-bar__left">
+        <h1 class="board-title">My Project Board</h1>
+        <span class="board-badge" id="totalCount">0 tasks</span>
+      </div>
+      <div class="board-bar__right">
+        <button class="btn btn--outline" id="clearAllBtn">
+          <i class="fa-solid fa-trash"></i> Clear All
+        </button>
+        <button class="btn btn--primary" id="addTaskBtn">
+          <i class="fa-solid fa-plus"></i> Add Task
+        </button>
+      </div>
+    </div>
+
+    <!-- Kanban Board -->
+    <main class="board" id="board">
+      <!-- Todo Column -->
+      <div class="column" data-status="todo">
+        <div class="column__header">
+          <div class="column__title">
+            <span class="column__dot dot--todo"></span>
+            <h2>To Do</h2>
+            <span class="column__count" id="todoCount">0</span>
+          </div>
+          <button class="btn btn--icon column__add" data-status="todo" title="Add task">
+            <i class="fa-solid fa-plus"></i>
+          </button>
+        </div>
+        <div class="column__body" id="todoList" ondragover="allowDrop(event)" ondrop="drop(event, 'todo')">
+          <!-- Tasks injected here -->
+        </div>
+      </div>
+
+      <!-- In Progress Column -->
+      <div class="column" data-status="inprogress">
+        <div class="column__header">
+          <div class="column__title">
+            <span class="column__dot dot--inprogress"></span>
+            <h2>In Progress</h2>
+            <span class="column__count" id="inprogressCount">0</span>
+          </div>
+          <button class="btn btn--icon column__add" data-status="inprogress" title="Add task">
+            <i class="fa-solid fa-plus"></i>
+          </button>
+        </div>
+        <div class="column__body" id="inprogressList" ondragover="allowDrop(event)" ondrop="drop(event, 'inprogress')">
+          <!-- Tasks injected here -->
+        </div>
+      </div>
+
+      <!-- Review Column -->
+      <div class="column" data-status="review">
+        <div class="column__header">
+          <div class="column__title">
+            <span class="column__dot dot--review"></span>
+            <h2>Review</h2>
+            <span class="column__count" id="reviewCount">0</span>
+          </div>
+          <button class="btn btn--icon column__add" data-status="review" title="Add task">
+            <i class="fa-solid fa-plus"></i>
+          </button>
+        </div>
+        <div class="column__body" id="reviewList" ondragover="allowDrop(event)" ondrop="drop(event, 'review')">
+          <!-- Tasks injected here -->
+        </div>
+      </div>
+
+      <!-- Done Column -->
+      <div class="column" data-status="done">
+        <div class="column__header">
+          <div class="column__title">
+            <span class="column__dot dot--done"></span>
+            <h2>Done</h2>
+            <span class="column__count" id="doneCount">0</span>
+          </div>
+          <button class="btn btn--icon column__add" data-status="done" title="Add task">
+            <i class="fa-solid fa-plus"></i>
+          </button>
+        </div>
+        <div class="column__body" id="doneList" ondragover="allowDrop(event)" ondrop="drop(event, 'done')">
+          <!-- Tasks injected here -->
+        </div>
+      </div>
+    </main>
+
+    <!-- Add/Edit Task Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal" id="modal">
+        <div class="modal__header">
+          <h3 id="modalTitle">Add New Task</h3>
+          <button class="btn btn--icon" id="closeModal">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="modal__body">
+          <div class="form-group">
+            <label for="taskTitle">Task Title <span class="required">*</span></label>
+            <input type="text" id="taskTitle" placeholder="e.g. Design login screen" maxlength="80" />
+            <span class="char-count" id="charCount">0/80</span>
+          </div>
+          <div class="form-group">
+            <label for="taskDesc">Description</label>
+            <textarea id="taskDesc" placeholder="Add a short description..." rows="3"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="taskPriority">Priority</label>
+              <select id="taskPriority">
+                <option value="low">🟢 Low</option>
+                <option value="medium" selected>🟡 Medium</option>
+                <option value="high">🔴 High</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="taskStatus">Status</label>
+              <select id="taskStatus">
+                <option value="todo">To Do</option>
+                <option value="inprogress">In Progress</option>
+                <option value="review">Review</option>
+                <option value="done">Done</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="taskTag">Tag</label>
+            <input type="text" id="taskTag" placeholder="e.g. Frontend, Bug, Feature" maxlength="20" />
+          </div>
+        </div>
+        <div class="modal__footer">
+          <button class="btn btn--outline" id="cancelBtn">Cancel</button>
+          <button class="btn btn--primary" id="saveTaskBtn">Save Task</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Confirm Modal -->
+    <div class="modal-overlay" id="deleteOverlay">
+      <div class="modal modal--sm">
+        <div class="modal__header">
+          <h3>Delete Task?</h3>
+          <button class="btn btn--icon" id="closeDeleteModal">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="modal__body">
+          <p>Are you sure you want to delete <strong id="deleteTaskName"></strong>? This cannot be undone.</p>
+        </div>
+        <div class="modal__footer">
+          <button class="btn btn--outline" id="cancelDeleteBtn">Cancel</button>
+          <button class="btn btn--danger" id="confirmDeleteBtn">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+      <i class="fa-solid fa-circle-check"></i>
+      <span id="toastMsg">Task saved!</span>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
